@@ -85,10 +85,8 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.serialization.json)
 
-// Room
-    implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
-    implementation(libs.room.ktx)
+// Realm
+    implementation(libs.realm)
 
 // DataStore
     implementation(libs.datastore.preferences)
