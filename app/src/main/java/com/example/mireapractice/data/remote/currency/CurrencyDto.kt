@@ -3,32 +3,35 @@ package com.example.mireapractice.data.remote.currency
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
+/**
+ * DTO для ответа API курсов валют ЦБ РФ
+ * Структура: https://api-flag-5ti4.onrender.com/api/currencies
+ */
 data class ExchangeRateDto(
-    @SerializedName("Date")
+    @SerializedName("date")
     val date: String,
-    @SerializedName("PreviousDate")
-    val previousDate: String,
-    @SerializedName("PreviousURL")
-    val previousUrl: String,
-    @SerializedName("Timestamp")
+    @SerializedName("timestamp")
     val timestamp: String,
-    @SerializedName("Valute")
-    val valute: Map<String, CurrencyDto>
+    @SerializedName("currencies")
+    val currencies: List<CurrencyDto>
 )
 
+/**
+ * DTO для отдельной валюты из API ЦБ РФ
+ */
 data class CurrencyDto(
-    @SerializedName("ID")
-    val id: String? = null,
-    @SerializedName("NumCode")
-    val numCode: String? = null,
-    @SerializedName("CharCode")
-    val charCode: String? = null,
-    @SerializedName("Nominal")
-    val nominal: Int? = null,
-    @SerializedName("Name")
-    val name: String? = null,
-    @SerializedName("Value")
-    val value: BigDecimal? = null,
-    @SerializedName("Previous")
-    val previous: BigDecimal? = null
+    @SerializedName("charCode")
+    val charCode: String,
+    @SerializedName("numCode")
+    val numCode: String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("value")
+    val value: Double,
+    @SerializedName("nominal")
+    val nominal: Int,
+    @SerializedName("previous")
+    val previous: Double,
+    @SerializedName("flag")
+    val flag: String? = null
 )

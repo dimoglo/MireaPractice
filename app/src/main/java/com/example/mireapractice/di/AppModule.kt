@@ -33,7 +33,7 @@ object AppModule {
     @Singleton
     fun provideCurrencyRetrofit(): CurrencyApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.cbr-xml-daily.ru/")
+            .baseUrl("https://api-flag-5ti4.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()

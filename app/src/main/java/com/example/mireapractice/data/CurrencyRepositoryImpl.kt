@@ -24,7 +24,7 @@ class CurrencyRepositoryImpl @Inject constructor(
 
     override suspend fun fetchAndCacheExchangeRate(): ExchangeRateModel = withContext(Dispatchers.IO) {
         val dto = currencyApiService.getExchangeRate()
-        val exchangeEntity = dto.toEntity() ?: throw IllegalStateException()
+        val exchangeEntity = dto.toEntity()
 
         realm.write {
             val old = query<ExchangeRateEntity>("date == $0", exchangeEntity.date).first().find()
@@ -32,8 +32,9 @@ class CurrencyRepositoryImpl @Inject constructor(
             copyToRealm(exchangeEntity)
         }
 
-        dto.valute.values.forEach { currencyDto ->
-            val entity = currencyDto.toEntity(exchangeEntity.date) ?: return@forEach
+        // Обрабатываем список валют вместо Map
+        dto.currencies.forEach { currencyDto ->
+            val entity = currencyDto.toEntity(exchangeEntity.date)
             realm.write {
                 val old = query<CurrencyEntity>("id == $0", entity.id).first().find()
                 if (old != null) delete(old)

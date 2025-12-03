@@ -8,20 +8,22 @@ import java.math.BigDecimal
 class ExchangeRateEntity: RealmObject {
     @PrimaryKey
     var date: String = EMPTY_STRING
-    var previousDate: String? = null
-    var previousURL: String? = null
     var timestamp: String? = null
     var updateAt: Long? = null
 }
 
 class CurrencyEntity: RealmObject {
+    /**
+     * Составной ключ: charCode + exchangeRateId для уникальности валюты на конкретную дату
+     */
     @PrimaryKey
     var id: String = EMPTY_STRING
     var exchangeRateId: String = EMPTY_STRING
-    var numCode: String? = null
-    var charCode: String? = null
-    var nominal: Int? = null
-    var name: String? = null
+    var numCode: String = EMPTY_STRING
+    var charCode: String = EMPTY_STRING
+    var nominal: Int = 1
+    var name: String = EMPTY_STRING
     var value: BigDecimal? = null
     var previous: BigDecimal? = null
+    var flag: String? = null
 }
