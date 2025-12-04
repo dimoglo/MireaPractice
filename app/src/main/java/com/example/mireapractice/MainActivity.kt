@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.mireapractice.common.theme.MireaPracticeTheme
 import com.example.mireapractice.ui.banks.ExchangeInBanksScreen
+import com.example.mireapractice.ui.calculator.CalculatorScreen
 import com.example.mireapractice.ui.components.bottombar.BottomBarType
 import com.example.mireapractice.ui.home.HomeScreen
 import com.example.mireapractice.ui.news.NewsScreen
@@ -25,7 +26,8 @@ enum class Screen {
     HOME,
     NOTIFICATIONS,
     NEWS,
-    EXCHANGE_IN_BANKS
+    EXCHANGE_IN_BANKS,
+    CALCULATOR
 }
 
 @AndroidEntryPoint
@@ -63,6 +65,9 @@ fun Navigation() {
                         when (tab) {
                             BottomBarType.EXCHANGE -> {
                                 currentScreen = Screen.EXCHANGE_IN_BANKS
+                            }
+                            BottomBarType.CALCULATOR -> {
+                                currentScreen = Screen.CALCULATOR
                             }
                             else -> {
                                 // Можно добавить логику для других табов
@@ -103,6 +108,26 @@ fun Navigation() {
                         when (tab) {
                             BottomBarType.HOME -> {
                                 currentScreen = Screen.HOME
+                            }
+                            BottomBarType.CALCULATOR -> {
+                                currentScreen = Screen.CALCULATOR
+                            }
+                            else -> {
+                                // Можно добавить логику для других табов
+                            }
+                        }
+                    }
+                )
+            }
+            Screen.CALCULATOR -> {
+                CalculatorScreen(
+                    onTabSelected = { tab ->
+                        when (tab) {
+                            BottomBarType.HOME -> {
+                                currentScreen = Screen.HOME
+                            }
+                            BottomBarType.EXCHANGE -> {
+                                currentScreen = Screen.EXCHANGE_IN_BANKS
                             }
                             else -> {
                                 // Можно добавить логику для других табов
