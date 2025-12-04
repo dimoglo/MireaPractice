@@ -1,6 +1,7 @@
 package com.example.mireapractice.ui.components.currency_cards
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -18,11 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.example.mireapractice.R
+import com.example.mireapractice.common.theme.Color1
+import com.example.mireapractice.common.theme.Color2
 import com.example.mireapractice.ui.components.arrows.ArrowDown
 import com.example.mireapractice.ui.components.arrows.ArrowUp
 import com.example.mireapractice.common.utils.Constants.SIXTEEN
@@ -41,51 +48,55 @@ fun CurrencyCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color1,
+                shape = RoundedCornerShape(SIXTEEN.dp)
+            )
             .background(
                 Color(0xFFFFE5CC),
                 RoundedCornerShape(SIXTEEN.dp)
             )
             .padding(SIXTEEN.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Левая часть: название валюты и разница
-            Column(
-                modifier = Modifier.weight(1f)
+            // Верхняя часть: название валюты и разница
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Название валюты
                 Text(
                     text = currencyItem.name,
                     fontSize = TWENTY.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color2,
+                    modifier = Modifier.weight(1f)
                 )
                 
-                Spacer(Modifier.height(TWELVE.dp))
-                
+                // Стрелка и разница
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     if (currencyItem.isUp) {
-                        ArrowUp(color = diffColor, size = 16.dp)
+                        ArrowUp(color = diffColor, size = 12.dp)
                     } else {
-                        ArrowDown(color = diffColor, size = 16.dp)
+                        ArrowDown(color = diffColor, size = 12.dp)
                     }
-                    
-                    Spacer(Modifier.width(8.dp))
-                    
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                     Text(
-                        text = "$diffSign${formatNumber(currencyItem.diffValue)}",
+                        text = "$diffSign ${formatNumber(Math.abs(currencyItem.diffValue))} ₽",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = diffColor
                     )
-                    
-                    Spacer(Modifier.width(8.dp))
-                    
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                     Text(
-                        text = "($diffSign${formatPercent(currencyItem.diffPercent)}%)",
+                        text = "${formatPercent(Math.abs(currencyItem.diffPercent))}%",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = diffColor
@@ -93,14 +104,18 @@ fun CurrencyCard(
                 }
             }
             
-            // Правая часть: флаги и значения
+            Spacer(Modifier.height(SIXTEEN.dp))
+            
+            // Нижняя часть: флаги и значения валют
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(TWELVE.dp)
             ) {
-                // Флаг и код валюты
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                // Левая секция: флаг валюты и код
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (currencyItem.flagUrl != null) {
                         AsyncImage(
@@ -108,19 +123,34 @@ fun CurrencyCard(
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(24.dp)
                                 .clip(RoundedCornerShape(4.dp))
                         )
                     }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "${currencyItem.nominal} ${currencyItem.charCode}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
+                    
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                Transparent,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = Color.White,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "${currencyItem.nominal} ${currencyItem.charCode}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
                 }
                 
+                // Знак равенства
                 Text(
                     text = "=",
                     fontSize = 20.sp,
@@ -128,29 +158,41 @@ fun CurrencyCard(
                     color = Color.Black
                 )
                 
-                // Флаг рубля и значение
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                // Правая секция: флаг рубля и значение
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Флаг России (можно использовать emoji или URL)
+                    // Флаг России
+                    Image(
+                        painter = painterResource(id = R.drawable.russian_flag),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                    
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
-                            .background(Color(0xFF0039A6), RoundedCornerShape(4.dp)),
-                        contentAlignment = Alignment.Center
+                            .background(
+                                Transparent,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = Color.White,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = "🇷🇺",
-                            fontSize = 20.sp
+                            text = "${formatNumber(currencyItem.rubValue)} RUB",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
                         )
                     }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = formatNumber(currencyItem.rubValue) + " RUB",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
                 }
             }
         }

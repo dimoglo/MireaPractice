@@ -25,10 +25,14 @@ fun ExchangeRateDto.toEntity(): ExchangeRateEntity {
  * Маппинг CurrencyDto в CurrencyEntity для сохранения в Realm
  * Используется составной ключ: charCode + exchangeRateId
  */
-fun CurrencyDto.toEntity(exchangeRateDate: String): CurrencyEntity {
+fun CurrencyDto.toEntity(exchangeRateDate: String): CurrencyEntity? {
+    // Пропускаем валюты без charCode и numCode
+    val codeForId = charCode.takeIf { it.isNotEmpty() && it.isNotBlank() } 
+        ?: numCode.takeIf { it.isNotEmpty() && it.isNotBlank() }
+        ?: return null
+    
     return CurrencyEntity().apply {
-        // Составной ключ для уникальности валюты на конкретную дату
-        id = "${charCode}_$exchangeRateDate"
+        id = "${codeForId}_$exchangeRateDate"
         exchangeRateId = exchangeRateDate
         numCode = this@toEntity.numCode
         charCode = this@toEntity.charCode

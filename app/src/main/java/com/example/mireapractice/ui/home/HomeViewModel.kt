@@ -42,13 +42,17 @@ class HomeViewModel @Inject constructor(
                         val currencies = exchangeRate.currencies
                         
                         val currencyItems = currencies.map { currency ->
+                            // Пересчитываем стоимость за единицу валюты
+                            val rubValuePerUnit = currency.value.toDouble() / currency.nominal
+                            val diffValuePerUnit = (currency.difference?.toDouble() ?: 0.0) / currency.nominal
+                            
                             CurrencyItem(
                                 flagUrl = currency.flag,
                                 name = currency.name,
-                                nominal = currency.nominal,
+                                nominal = 1, // Всегда показываем номинал как 1
                                 charCode = currency.charCode,
-                                rubValue = currency.value.toDouble(),
-                                diffValue = currency.difference?.toDouble() ?: 0.0,
+                                rubValue = rubValuePerUnit,
+                                diffValue = diffValuePerUnit,
                                 diffPercent = currency.percentChange?.toDouble() ?: 0.0,
                                 isUp = currency.isGrowing == true
                             )
@@ -61,13 +65,17 @@ class HomeViewModel @Inject constructor(
                         val cached = currencyRepository.getCachedExchangeRate()
                         if (cached != null) {
                             val currencyItems = cached.currencies.map { currency ->
+                                // Пересчитываем стоимость за единицу валюты
+                                val rubValuePerUnit = currency.value.toDouble() / currency.nominal
+                                val diffValuePerUnit = (currency.difference?.toDouble() ?: 0.0) / currency.nominal
+                                
                                 CurrencyItem(
                                     flagUrl = currency.flag,
                                     name = currency.name,
-                                    nominal = currency.nominal,
+                                    nominal = 1, // Всегда показываем номинал как 1
                                     charCode = currency.charCode,
-                                    rubValue = currency.value.toDouble(),
-                                    diffValue = currency.difference?.toDouble() ?: 0.0,
+                                    rubValue = rubValuePerUnit,
+                                    diffValue = diffValuePerUnit,
                                     diffPercent = currency.percentChange?.toDouble() ?: 0.0,
                                     isUp = currency.isGrowing == true
                                 )
@@ -155,11 +163,51 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onDateSelected(date: Long) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val selectedDateString = dateFormat.format(date)
-        _uiState.value = _uiState.value.copy(selectedDate = selectedDateString)
-        // Перезагружаем данные для выбранной даты
-        loadData()
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true)
+                
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val selectedDateString = dateFormat.format(date)
+                
+                // Пытаемся загрузить данные для выбранной даты из кэша
+                val exchangeRate = currencyRepository.getExchangeRateByDate(selectedDateString)
+                
+                if (exchangeRate != null) {
+                    val currencyItems = exchangeRate.currencies.map { currency ->
+                        val rubValuePerUnit = currency.value.toDouble() / currency.nominal
+                        val diffValuePerUnit = (currency.difference?.toDouble() ?: 0.0) / currency.nominal
+                        
+                        CurrencyItem(
+                            flagUrl = currency.flag,
+                            name = currency.name,
+                            nominal = 1,
+                            charCode = currency.charCode,
+                            rubValue = rubValuePerUnit,
+                            diffValue = diffValuePerUnit,
+                            diffPercent = currency.percentChange?.toDouble() ?: 0.0,
+                            isUp = currency.isGrowing == true
+                        )
+                    }
+                    
+                    _uiState.value = _uiState.value.copy(
+                        currencies = currencyItems,
+                        selectedDate = selectedDateString,
+                        isLoading = false,
+                        error = null
+                    )
+                } else {
+                    // Если данных нет в кэше, загружаем свежие данные
+                    loadData()
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка загрузки валют для даты")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message
+                )
+            }
+        }
     }
 
     fun onNotificationClick() {

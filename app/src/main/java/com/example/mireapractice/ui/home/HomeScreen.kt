@@ -258,7 +258,10 @@ fun HomeScreen(
                 }
 
                 // Список валют
-                items(uiState.currencies) { currency ->
+                items(
+                    items = uiState.currencies,
+                    key = { it.charCode }
+                ) { currency ->
                     CurrencyCard(currencyItem = currency)
                 }
 

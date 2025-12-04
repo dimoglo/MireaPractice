@@ -12,6 +12,11 @@ interface CurrencyRepository {
     suspend fun getCachedExchangeRate(): ExchangeRateModel?
 
     /**
+     * Получить курсы валют по конкретной дате
+     */
+    suspend fun getExchangeRateByDate(date: String): ExchangeRateModel?
+
+    /**
      * Вернуть список популярных валют
      */
     suspend fun getPopularCurrencies(): List<CurrencyModel>
