@@ -11,6 +11,7 @@ object Constants {
     const val TWELVE = 12
 
     const val SIXTEEN = 16
+    const val TWENTY_FOUR = 24
     const val THIRTY_TWO = 32
     const val SIXTY_FOUR = 64
 
@@ -20,7 +21,6 @@ object Constants {
     const val TEN = 10
     const val FOURTEEN = 14
     const val TWENTY = 20
-    const val TWENTY_TWO = 22
     const val SIXTY = 60
     const val EIGHTY = 80
 }

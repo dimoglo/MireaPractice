@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+ 
+    <!-- Bottom base line -->
+    <path
+        android:fillColor="#3F92A1"
+        android:pathData="M5,19h18a1,1 0 0 1 0,2H3a1,1 0 0 1 0,-2z" />
+ 
+    <!-- Left bar with rounded corners -->
+    <path
+        android:fillColor="#3F92A1"
+        android:pathData="M5,10.5 a0.5,0.5 0 0 1 0.5,-0.5 h2 a0.5,0.5 0 0 1 0.5,0.5 v7 a0.5,0.5 0 0 1 -0.5,0.5 h-2 a0.5,0.5 0 0 1 -0.5,-0.5 z" />
+ 
+    <!-- Tall center-left bar with rounded corners -->
+    <path
+        android:fillColor="#3F92A1"
+        android:pathData="M10,4.5 a0.5,0.5 0 0 1 0.5,-0.5 h2 a0.5,0.5 0 0 1 0.5,0.5 v13 a0.5,0.5 0 0 1 -0.5,0.5 h-2 a0.5,0.5 0 0 1 -0.5,-0.5 z" />
+ 
+    <!-- Center-narrow bar with rounded corners (outline only) -->
+    <path
+        android:strokeColor="#3F92A1"
+        android:strokeWidth="1"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M15.5,8 a0.5,0.5 0 0 1 0.5,-0.5 h1.5 a0.5,0.5 0 0 1 0.5,0.5 v9 a0.5,0.5 0 0 1 -0.5,0.5 h-1.5 a0.5,0.5 0 0 1 -0.5,-0.5 z" />
+ 
+    <!-- Right bar with rounded corners -->
+    <path
+        android:fillColor="#3F92A1"
+        android:pathData="M20,12.5 a0.5,0.5 0 0 1 0.5,-0.5 h2 a0.5,0.5 0 0 1 0.5,0.5 v5 a0.5,0.5 0 0 1 -0.5,0.5 h-2 a0.5,0.5 0 0 1 -0.5,-0.5 z" />
+ 
+</vector>

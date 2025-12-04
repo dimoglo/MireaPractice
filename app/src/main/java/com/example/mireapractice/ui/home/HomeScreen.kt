@@ -1,5 +1,6 @@
 package com.example.mireapractice.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.layout.layoutId
@@ -51,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mireapractice.R
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mireapractice.common.theme.Color1
+import com.example.mireapractice.common.theme.Color2
 import com.example.mireapractice.ui.components.banner.Banner
 import com.example.mireapractice.ui.components.bottombar.BottomBar
 import com.example.mireapractice.ui.components.bottombar.BottomBarType
@@ -60,6 +64,7 @@ import com.example.mireapractice.ui.components.navbar.NavBarDefaults
 import com.example.mireapractice.ui.components.navbar.NavBarLayoutMeasurePolicy
 import com.example.mireapractice.common.utils.Constants.SIXTEEN
 import com.example.mireapractice.common.utils.Constants.TWELVE
+import com.example.mireapractice.common.utils.Constants.TWENTY_FOUR
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -117,29 +122,36 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
 
-            // NavBar поверх всего контента - выравниваем сверху
-            Box(
+            // Верхняя часть с логотипом и NavBar
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
                     .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
             ) {
+                // Row с "Валютный компас" и логотипом
                 Row(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = SIXTEEN.dp, vertical = SIXTEEN.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Валютный компас",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color2
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Image(
                         painter = painterResource(R.drawable.logo),
                         contentDescription = null,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-                Spacer(modifier = Modifier.padding(SIXTEEN.dp))
-                    
+                
+                // NavBar
                 NavBar(
                     left = { modifier ->
                         Box(modifier = modifier)
@@ -149,7 +161,7 @@ fun HomeScreen(
                             text = "Главная",
                             fontSize = 32.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black,
+                            color = Color2,
                             modifier = modifier
                         )
                     },
@@ -157,10 +169,10 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Уведомления",
-                            tint = Color.Black,
+                            tint = Color2,
                             modifier = modifier
-                                .clickable { onNotificationClick() }
                                 .size(28.dp)
+                                .clickable { onNotificationClick() }
                         )
                     },
                     measurePolicy = NavBarLayoutMeasurePolicy()
@@ -170,11 +182,10 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top)),
+                    .padding(paddingValues),
                 contentPadding = PaddingValues(
                     horizontal = SIXTEEN.dp,
-                    vertical = SIXTEEN.dp
+                    vertical = TWENTY_FOUR.dp + NavBarDefaults.NavBarHeight.dp + SIXTEEN.dp + 24.dp + SIXTEEN.dp // Отступ сверху для логотипа + NavBar
                 ),
                 verticalArrangement = Arrangement.spacedBy(SIXTEEN.dp)
             ) {
@@ -184,7 +195,7 @@ fun HomeScreen(
                         text = "Новости",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color1
                     )
                 }
 
@@ -205,7 +216,7 @@ fun HomeScreen(
                             text = "Курсы ЦБ на",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color1
                         )
 
                         Box(
