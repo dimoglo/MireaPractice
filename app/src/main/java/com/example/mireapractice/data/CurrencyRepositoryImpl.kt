@@ -65,7 +65,7 @@ class CurrencyRepositoryImpl @Inject constructor(
             .find()
 
         return@withContext all
-            .filter { it.charCode != null && popularCodes.contains(it.charCode) }
+            .filter { popularCodes.contains(it.charCode) }
             .map { it.toModel() }
     }
 

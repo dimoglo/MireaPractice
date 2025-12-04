@@ -34,9 +34,9 @@ fun CurrencyDto.toEntity(exchangeRateDate: String): CurrencyEntity {
         charCode = this@toEntity.charCode
         nominal = this@toEntity.nominal
         name = this@toEntity.name
-        // Конвертируем Double в BigDecimal для точности вычислений
-        value = BigDecimal.valueOf(this@toEntity.value)
-        previous = BigDecimal.valueOf(this@toEntity.previous)
+        // Сохраняем как String (Realm не поддерживает BigDecimal напрямую)
+        value = BigDecimal.valueOf(this@toEntity.value).toString()
+        previous = BigDecimal.valueOf(this@toEntity.previous).toString()
         flag = this@toEntity.flag
     }
 }
@@ -58,8 +58,9 @@ fun ExchangeRateEntity.toModel(currencies: List<CurrencyModel>): ExchangeRateMod
  * Вычисляет разницу, процент изменения и направление тренда
  */
 fun CurrencyEntity.toModel(): CurrencyModel {
-    val valueBigDecimal = value ?: BigDecimal.ZERO
-    val previousBigDecimal = previous ?: BigDecimal.ZERO
+    // Конвертируем String обратно в BigDecimal
+    val valueBigDecimal = value?.let { BigDecimal(it) } ?: BigDecimal.ZERO
+    val previousBigDecimal = previous?.let { BigDecimal(it) } ?: BigDecimal.ZERO
     
     // Вычисляем разницу
     val diff = valueBigDecimal.subtract(previousBigDecimal)

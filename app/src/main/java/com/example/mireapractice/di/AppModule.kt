@@ -11,6 +11,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import com.example.mireapractice.data.local.CurrencyEntity
+import com.example.mireapractice.data.local.ExchangeRateEntity
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.CoroutineScope
@@ -84,6 +86,18 @@ object AppModule {
             .build()
 
         return retrofit.create(BankApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRealmConfiguration(): RealmConfiguration {
+        return RealmConfiguration.Builder(
+            schema = setOf(
+                ExchangeRateEntity::class,
+                CurrencyEntity::class
+            )
+        )
+            .build()
     }
 
     @Provides

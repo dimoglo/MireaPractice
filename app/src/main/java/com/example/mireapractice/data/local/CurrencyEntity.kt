@@ -3,7 +3,6 @@ package com.example.mireapractice.data.local
 import com.example.mireapractice.common.utils.Constants.EMPTY_STRING
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
-import java.math.BigDecimal
 
 class ExchangeRateEntity: RealmObject {
     @PrimaryKey
@@ -23,7 +22,8 @@ class CurrencyEntity: RealmObject {
     var charCode: String = EMPTY_STRING
     var nominal: Int = 1
     var name: String = EMPTY_STRING
-    var value: BigDecimal? = null
-    var previous: BigDecimal? = null
+    // Используем String для хранения BigDecimal значений (Realm не поддерживает BigDecimal напрямую)
+    var value: String? = null
+    var previous: String? = null
     var flag: String? = null
 }

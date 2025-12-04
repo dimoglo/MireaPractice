@@ -1,7 +1,7 @@
 package com.example.mireapractice.ui.components.currency_cards
 
 data class CurrencyItem(
-    val flagResId: Int,       // ресурс флага, например, R.drawable.flag_aud
+    val flagUrl: String?,     // URL флага из API
     val name: String,         // "Австралийский доллар"
     val nominal: Int,         // 1
     val charCode: String,     // "AUD"
