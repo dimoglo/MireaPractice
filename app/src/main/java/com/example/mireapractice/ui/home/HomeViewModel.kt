@@ -2,6 +2,7 @@ package com.example.mireapractice.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mireapractice.common.utils.PopularCurrency
 import com.example.mireapractice.data.remote.news.NewsApiService
 import com.example.mireapractice.domain.CurrencyRepository
 import com.example.mireapractice.ui.components.banner.BannerUi
@@ -56,7 +57,7 @@ class HomeViewModel @Inject constructor(
                                 diffPercent = currency.percentChange?.toDouble() ?: 0.0,
                                 isUp = currency.isGrowing == true
                             )
-                        }
+                        }.sortedBy { PopularCurrency.getOrder(it.charCode) }
                         
                         Pair(exchangeRate.date, currencyItems)
                     } catch (e: Exception) {
@@ -79,7 +80,7 @@ class HomeViewModel @Inject constructor(
                                     diffPercent = currency.percentChange?.toDouble() ?: 0.0,
                                     isUp = currency.isGrowing == true
                                 )
-                            }
+                            }.sortedBy { PopularCurrency.getOrder(it.charCode) }
                             Pair(cached.date, currencyItems)
                         } else {
                             throw e
@@ -188,7 +189,7 @@ class HomeViewModel @Inject constructor(
                             diffPercent = currency.percentChange?.toDouble() ?: 0.0,
                             isUp = currency.isGrowing == true
                         )
-                    }
+                    }.sortedBy { PopularCurrency.getOrder(it.charCode) }
                     
                     _uiState.value = _uiState.value.copy(
                         currencies = currencyItems,
