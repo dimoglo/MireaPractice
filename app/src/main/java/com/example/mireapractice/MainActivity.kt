@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.mireapractice.common.theme.MireaPracticeTheme
-import com.example.mireapractice.ui.components.banner.BannerUi
+import com.example.mireapractice.ui.banks.ExchangeInBanksScreen
 import com.example.mireapractice.ui.components.bottombar.BottomBarType
 import com.example.mireapractice.ui.home.HomeScreen
 import com.example.mireapractice.ui.news.NewsScreen
@@ -24,7 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint
 enum class Screen {
     HOME,
     NOTIFICATIONS,
-    NEWS
+    NEWS,
+    EXCHANGE_IN_BANKS
 }
 
 @AndroidEntryPoint
@@ -59,7 +60,14 @@ fun Navigation() {
                         currentScreen = Screen.NEWS
                     },
                     onTabSelected = { tab ->
-                        // Можно добавить логику переключения табов в будущем
+                        when (tab) {
+                            BottomBarType.EXCHANGE -> {
+                                currentScreen = Screen.EXCHANGE_IN_BANKS
+                            }
+                            else -> {
+                                // Можно добавить логику для других табов
+                            }
+                        }
                     }
                 )
             }
@@ -85,6 +93,20 @@ fun Navigation() {
                         // При выборе таба возвращаемся на главную
                         if (tab == BottomBarType.HOME) {
                             currentScreen = Screen.HOME
+                        }
+                    }
+                )
+            }
+            Screen.EXCHANGE_IN_BANKS -> {
+                ExchangeInBanksScreen(
+                    onTabSelected = { tab ->
+                        when (tab) {
+                            BottomBarType.HOME -> {
+                                currentScreen = Screen.HOME
+                            }
+                            else -> {
+                                // Можно добавить логику для других табов
+                            }
                         }
                     }
                 )
