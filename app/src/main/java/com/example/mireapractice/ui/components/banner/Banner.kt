@@ -2,6 +2,7 @@ package com.example.mireapractice.ui.components.banner
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +36,8 @@ import com.example.mireapractice.common.utils.Constants.TWENTY
 @Composable
 fun Banner(
     banner: BannerUi,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -46,6 +48,7 @@ fun Banner(
                 color = Color1,
                 shape = RoundedCornerShape(TWENTY.dp)
             )
+            .clickable { onClick() }
     ) {
 
         Column(

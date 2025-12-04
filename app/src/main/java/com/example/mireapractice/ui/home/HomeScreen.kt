@@ -66,6 +66,9 @@ import com.example.mireapractice.common.utils.Constants.SIXTEEN
 import com.example.mireapractice.common.utils.Constants.TWELVE
 import com.example.mireapractice.common.utils.Constants.TWENTY_FOUR
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 import java.util.Locale
 
@@ -74,6 +77,7 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNotificationClick: () -> Unit = {},
+    onNewsClick: () -> Unit = {},
     onTabSelected: (BottomBarType) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -89,103 +93,116 @@ fun HomeScreen(
     val selectedDateLong = remember(uiState.selectedDate) {
         if (uiState.selectedDate.isNotEmpty()) {
             try {
-                inputDateFormat.parse(uiState.selectedDate)?.time ?: System.currentTimeMillis()
+                // Извлекаем только дату из ISO формата (если есть)
+                val dateOnly = if (uiState.selectedDate.contains("T")) {
+                    uiState.selectedDate.substringBefore("T")
+                } else {
+                    uiState.selectedDate
+                }
+                
+                // Используем LocalDate для парсинга даты без времени и часовых поясов
+                val localDate = LocalDate.parse(dateOnly)
+                // Преобразуем LocalDate в миллисекунды через начало дня в UTC
+                // DatePicker работает с UTC временем, поэтому используем UTC
+                val zonedDateTime = localDate.atStartOfDay(ZoneOffset.UTC)
+                zonedDateTime.toInstant().toEpochMilli()
             } catch (e: Exception) {
-                System.currentTimeMillis()
+                // В случае ошибки используем текущую дату
+                val today = LocalDate.now()
+                today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
             }
         } else {
-            System.currentTimeMillis()
+            // Если дата не выбрана, используем текущую дату
+            val today = LocalDate.now()
+            today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
         }
     }
 
+    // Пересоздаем DatePickerState при изменении даты, чтобы синхронизировать с отображаемой датой
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateLong
     )
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        bottomBar = {
-            BottomBar(
-                selectedTab = BottomBarType.HOME,
-                onTabSelected = onTabSelected
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Фоновое изображение
-            Image(
-                painter = painterResource(id = R.drawable.ic_background),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Фоновое изображение
+        Image(
+            painter = painterResource(id = R.drawable.ic_background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-            // Верхняя часть с логотипом и NavBar
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
+        ) {
+            // 1. Лого
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .windowInsetsPadding(WindowInsets.statusBars.only(WindowInsetsSides.Top))
+                    .padding(horizontal = SIXTEEN.dp, vertical = SIXTEEN.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Row с "Валютный компас" и логотипом
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = SIXTEEN.dp, vertical = SIXTEEN.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Text(
+                    text = "Валютный компас",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color2
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            // 2. NavBar
+            NavBar(
+                left = { modifier ->
+                    Box(modifier = modifier)
+                },
+                middle = { modifier ->
                     Text(
-                        text = "Валютный компас",
-                        fontSize = 16.sp,
+                        text = "Главная",
+                        fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color2
+                        color = Color2,
+                        modifier = modifier
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                
-                // NavBar
-                NavBar(
-                    left = { modifier ->
-                        Box(modifier = modifier)
-                    },
-                    middle = { modifier ->
-                        Text(
-                            text = "Главная",
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color2,
-                            modifier = modifier
-                        )
-                    },
-                    right = { modifier ->
+                },
+                right = { modifier ->
+                    Box(
+                        modifier = modifier
+                            .clickable { onNotificationClick() }
+                            .size(28.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = "Уведомления",
                             tint = Color2,
-                            modifier = modifier
-                                .size(28.dp)
-                                .clickable { onNotificationClick() }
+                            modifier = Modifier.size(28.dp)
                         )
-                    },
-                    measurePolicy = NavBarLayoutMeasurePolicy()
-                )
-            }
+                    }
+                },
+                measurePolicy = NavBarLayoutMeasurePolicy(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.padding(end = 16.dp))
 
+            // 3. Контент
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 contentPadding = PaddingValues(
                     horizontal = SIXTEEN.dp,
-                    vertical = TWENTY_FOUR.dp + NavBarDefaults.NavBarHeight.dp + SIXTEEN.dp + 24.dp + SIXTEEN.dp // Отступ сверху для логотипа + NavBar
+                    vertical = SIXTEEN.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(SIXTEEN.dp)
             ) {
@@ -200,7 +217,13 @@ fun HomeScreen(
                 }
 
                 items(uiState.news) { newsItem ->
-                    Banner(banner = newsItem)
+                    Banner(
+                        banner = newsItem,
+                        onClick = { 
+                            // Переходим на экран новостей
+                            onNewsClick()
+                        }
+                    )
                 }
 
                 // Заголовок курсов валют
@@ -234,13 +257,39 @@ fun HomeScreen(
                                 Text(
                                     text = if (uiState.selectedDate.isNotEmpty()) {
                                         try {
-                                            val date = inputDateFormat.parse(uiState.selectedDate)
-                                            date?.let { dateFormat.format(it) } ?: ""
+                                            // Извлекаем только дату из ISO формата
+                                            val dateString = if (uiState.selectedDate.contains("T")) {
+                                                uiState.selectedDate.substringBefore("T")
+                                            } else {
+                                                uiState.selectedDate
+                                            }
+                                            // Используем LocalDate для парсинга и форматирования
+                                            val localDate = LocalDate.parse(dateString)
+                                            val calendar = Calendar.getInstance().apply {
+                                                set(Calendar.YEAR, localDate.year)
+                                                set(Calendar.MONTH, localDate.monthValue - 1)
+                                                set(Calendar.DAY_OF_MONTH, localDate.dayOfMonth)
+                                                set(Calendar.HOUR_OF_DAY, 12)
+                                                set(Calendar.MINUTE, 0)
+                                                set(Calendar.SECOND, 0)
+                                                set(Calendar.MILLISECOND, 0)
+                                            }
+                                            dateFormat.format(calendar.time)
                                         } catch (e: Exception) {
                                             uiState.selectedDate
                                         }
                                     } else {
-                                        dateFormat.format(Calendar.getInstance().time)
+                                        val today = LocalDate.now()
+                                        val calendar = Calendar.getInstance().apply {
+                                            set(Calendar.YEAR, today.year)
+                                            set(Calendar.MONTH, today.monthValue - 1)
+                                            set(Calendar.DAY_OF_MONTH, today.dayOfMonth)
+                                            set(Calendar.HOUR_OF_DAY, 12)
+                                            set(Calendar.MINUTE, 0)
+                                            set(Calendar.SECOND, 0)
+                                            set(Calendar.MILLISECOND, 0)
+                                        }
+                                        dateFormat.format(calendar.time)
                                     },
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
@@ -303,32 +352,45 @@ fun HomeScreen(
                     }
                 }
             }
+
+            // 4. BottomBar
+            BottomBar(
+                selectedTab = BottomBarType.HOME,
+                onTabSelected = onTabSelected
+            )
         }
     }
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let {
-                            viewModel.onDateSelected(it)
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                datePickerState.selectedDateMillis?.let { dateMillis ->
+                                    // DatePicker возвращает миллисекунды в UTC
+                                    // Преобразуем их в LocalDate через UTC
+                                    val localDate = java.time.Instant.ofEpochMilli(dateMillis)
+                                        .atZone(ZoneOffset.UTC)
+                                        .toLocalDate()
+                                    // Форматируем дату в формате yyyy-MM-dd
+                                    val dateString = localDate.toString()
+                                    viewModel.onDateSelected(dateString)
+                                }
+                                showDatePicker = false
+                            }
+                        ) {
+                            Text("OK")
                         }
-                        showDatePicker = false
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Отмена")
+                        }
                     }
                 ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Отмена")
+                    DatePicker(state = datePickerState)
                 }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
 }
 

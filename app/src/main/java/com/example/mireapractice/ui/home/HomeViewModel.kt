@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,7 +57,14 @@ class HomeViewModel @Inject constructor(
                             )
                         }.sortedBy { PopularCurrency.getOrder(it.charCode) }
                         
-                        Pair(exchangeRate.date, currencyItems)
+                        // Извлекаем только дату из ISO формата (если есть)
+                        val dateOnly = if (exchangeRate.date.contains("T")) {
+                            exchangeRate.date.substringBefore("T")
+                        } else {
+                            exchangeRate.date
+                        }
+                        
+                        Pair(dateOnly, currencyItems)
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка загрузки валют")
                         // Пытаемся загрузить из кэша
@@ -81,7 +86,15 @@ class HomeViewModel @Inject constructor(
                                     isUp = currency.isGrowing == true
                                 )
                             }.sortedBy { PopularCurrency.getOrder(it.charCode) }
-                            Pair(cached.date, currencyItems)
+                            
+                            // Извлекаем только дату из ISO формата (если есть)
+                            val dateOnly = if (cached.date.contains("T")) {
+                                cached.date.substringBefore("T")
+                            } else {
+                                cached.date
+                            }
+                            
+                            Pair(dateOnly, currencyItems)
                         } else {
                             throw e
                         }
@@ -163,16 +176,13 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    fun onDateSelected(date: Long) {
+    fun onDateSelected(dateString: String) {
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
                 
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val selectedDateString = dateFormat.format(date)
-                
                 // Пытаемся загрузить данные для выбранной даты из кэша
-                val exchangeRate = currencyRepository.getExchangeRateByDate(selectedDateString)
+                val exchangeRate = currencyRepository.getExchangeRateByDate(dateString)
                 
                 if (exchangeRate != null) {
                     val currencyItems = exchangeRate.currencies.map { currency ->
@@ -193,7 +203,7 @@ class HomeViewModel @Inject constructor(
                     
                     _uiState.value = _uiState.value.copy(
                         currencies = currencyItems,
-                        selectedDate = selectedDateString,
+                        selectedDate = dateString,
                         isLoading = false,
                         error = null
                     )
@@ -209,10 +219,6 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    fun onNotificationClick() {
-        // Обработка нажатия на колокольчик
     }
 }
 

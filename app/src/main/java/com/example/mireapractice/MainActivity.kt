@@ -6,10 +6,26 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.mireapractice.common.theme.MireaPracticeTheme
+import com.example.mireapractice.ui.components.banner.BannerUi
+import com.example.mireapractice.ui.components.bottombar.BottomBarType
 import com.example.mireapractice.ui.home.HomeScreen
+import com.example.mireapractice.ui.news.NewsScreen
+import com.example.mireapractice.ui.notifications.NotificationsScreen
 import dagger.hilt.android.AndroidEntryPoint
+
+enum class Screen {
+    HOME,
+    NOTIFICATIONS,
+    NEWS
+}
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -21,8 +37,57 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    Navigation()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun Navigation() {
+    var currentScreen by remember { mutableStateOf(Screen.HOME) }
+
+    key(currentScreen) {
+        when (currentScreen) {
+            Screen.HOME -> {
+                HomeScreen(
+                    onNotificationClick = {
+                        currentScreen = Screen.NOTIFICATIONS
+                    },
+                    onNewsClick = {
+                        currentScreen = Screen.NEWS
+                    },
+                    onTabSelected = { tab ->
+                        // Можно добавить логику переключения табов в будущем
+                    }
+                )
+            }
+            Screen.NOTIFICATIONS -> {
+                NotificationsScreen(
+                    onBackClick = {
+                        currentScreen = Screen.HOME
+                    },
+                    onTabSelected = { tab ->
+                        // При выборе таба возвращаемся на главную
+                        if (tab == BottomBarType.HOME) {
+                            currentScreen = Screen.HOME
+                        }
+                    }
+                )
+            }
+            Screen.NEWS -> {
+                NewsScreen(
+                    onBackClick = {
+                        currentScreen = Screen.HOME
+                    },
+                    onTabSelected = { tab ->
+                        // При выборе таба возвращаемся на главную
+                        if (tab == BottomBarType.HOME) {
+                            currentScreen = Screen.HOME
+                        }
+                    }
+                )
             }
         }
     }
