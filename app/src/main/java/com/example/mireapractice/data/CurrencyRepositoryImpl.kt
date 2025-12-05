@@ -117,4 +117,27 @@ class CurrencyRepositoryImpl @Inject constructor(
             .find()
             .map { it.toModel() }
     }
+
+    override suspend fun getExchangeRatesByDateRange(fromDate: String, toDate: String): List<ExchangeRateModel> = withContext(Dispatchers.IO) {
+        // Получаем все ExchangeRateEntity в диапазоне дат
+        val exchangeRates = realm.query<ExchangeRateEntity>()
+            .find()
+            .filter { exchangeRate ->
+                val dateOnly = if (exchangeRate.date.contains("T")) {
+                    exchangeRate.date.substringBefore("T")
+                } else {
+                    exchangeRate.date
+                }
+                dateOnly >= fromDate && dateOnly <= toDate
+            }
+            .sortedBy { it.date }
+
+        return@withContext exchangeRates.map { exchangeRate ->
+            val currencies = realm
+                .query<CurrencyEntity>("exchangeRateId == $0", exchangeRate.date)
+                .find()
+                .map { it.toModel() }
+            exchangeRate.toModel(currencies)
+        }
+    }
 }

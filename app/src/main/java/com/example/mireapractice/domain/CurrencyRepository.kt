@@ -25,4 +25,9 @@ interface CurrencyRepository {
      * Вернуть список всех валют
      */
     suspend fun getAllCurrencies(): List<CurrencyModel>
+
+    /**
+     * Получить курсы валют за период дат
+     */
+    suspend fun getExchangeRatesByDateRange(fromDate: String, toDate: String): List<ExchangeRateModel>
 }
