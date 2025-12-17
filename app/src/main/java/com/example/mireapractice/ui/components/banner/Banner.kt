@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -25,9 +24,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mireapractice.common.theme.Color1
 import com.example.mireapractice.common.theme.Color2
-import com.example.mireapractice.common.utils.Constants.EIGHT
 import com.example.mireapractice.common.utils.Constants.EIGHTY
-import com.example.mireapractice.common.utils.Constants.FOURTEEN
 import com.example.mireapractice.common.utils.Constants.SIX
 import com.example.mireapractice.common.utils.Constants.SIXTEEN
 import com.example.mireapractice.common.utils.Constants.TWELVE
